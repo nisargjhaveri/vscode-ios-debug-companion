@@ -1,7 +1,8 @@
 {
 	"name": "ios-debug-companion",
+	"publisher": "nisargjhaveri",
 	"displayName": "iOS Debug Companion",
-	"description": "",
+	"description": "Companion extension to support remote features in iOS Debug",
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.79.0"
