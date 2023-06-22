@@ -11,17 +11,15 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:ios-debug-companion.helloWorld"
+		"onCommand:ios-debug-companion.activate",
+		"onCommand:ios-debug-companion.startUsbmuxdReverseProxy"
 	],
 	"main": "./out/main.js",
-	"contributes": {
-		"commands": [
-			{
-				"command": "ios-debug-companion.helloWorld",
-				"title": "Hello World"
-			}
-		]
-	},
+	"contributes": {},
+	"extensionKind": [
+		"ui"
+	],
+	"api": "none",
 	"scripts": {
 		"vscode:prepublish": "npm run compile -- --minify",
 		"esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --external:ios-deploy/package.json --format=cjs --platform=node --target=es6",
@@ -37,6 +35,7 @@
 		"@types/mocha": "^9.1.1",
 		"@types/node": "16.x",
 		"@types/vscode": "^1.79.0",
+		"@types/ws": "^8.5.5",
 		"@typescript-eslint/eslint-plugin": "^5.30.0",
 		"@typescript-eslint/parser": "^5.30.0",
 		"@vscode/test-electron": "^2.1.5",
@@ -45,5 +44,9 @@
 		"glob": "^8.0.3",
 		"mocha": "^10.0.0",
 		"typescript": "^4.7.4"
+	},
+	"dependencies": {
+		"bpmux": "^8.2.1",
+		"ws": "^8.13.0"
 	}
 }
