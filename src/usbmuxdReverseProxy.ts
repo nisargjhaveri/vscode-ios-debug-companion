@@ -5,6 +5,17 @@ import { BPMux } from "bpmux";
 import { Duplex } from 'stream';
 import * as logger from './logger';
 
+function createUsbmuxdConnection(connectionListener: () => void) {
+    if (process.platform === "darwin" || process.platform === "linux") {
+        return net.createConnection("/var/run/usbmuxd", connectionListener);
+    }
+    else if (process.platform === "win32") {
+        return net.createConnection(27015, "127.0.0.1", connectionListener);
+    }
+
+    throw new Error("No known usbmuxd socket for the platform");
+}
+
 export function startUsbmuxdReverseProxy(url: string) {
     logger.log(`Connecting to "${url}"`);
     const ws = new WebSocket(url);
@@ -22,7 +33,7 @@ export function startUsbmuxdReverseProxy(url: string) {
         mux.on("peer_multiplex", (muxStream: Duplex) => {
             muxStream.on("error", () => {}); // Ignore errors
 
-            const usbmuxdSocket = net.createConnection("/var/run/usbmuxd", () => {
+            const usbmuxdSocket = createUsbmuxdConnection(() => {
                 usbmuxdSocket.pipe(muxStream).pipe(usbmuxdSocket);
             });
         });
