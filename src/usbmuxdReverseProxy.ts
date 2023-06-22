@@ -16,34 +16,43 @@ function createUsbmuxdConnection(connectionListener: () => void) {
     throw new Error("No known usbmuxd socket for the platform");
 }
 
-export function startUsbmuxdReverseProxy(url: string) {
+export async function startUsbmuxdReverseProxy(url: string) {
     logger.log(`Connecting to "${url}"`);
-    const ws = new WebSocket(url);
 
-    ws.on('error', (e) => { logger.error(e); });
+    return new Promise<void>((resolve, reject) => {
+        let resolved = false;
+        const ws = new WebSocket(url);
 
-    ws.on('open', () => {
-        logger.log(`Connected to "${url}"`);
+        ws.on('error', (e) => {
+            logger.error(e);
+            if (!resolved) { reject(e); }
+        });
 
-        const wsStream = createWebSocketStream(ws);
-        const mux = new BPMux(wsStream);
+        ws.on('open', () => {
+            logger.log(`Connected to "${url}"`);
 
-        mux.on("error", () => {}); // Ignore errors
+            const wsStream = createWebSocketStream(ws);
+            const mux = new BPMux(wsStream);
 
-        mux.on("peer_multiplex", (muxStream: Duplex) => {
-            muxStream.on("error", () => {}); // Ignore errors
+            mux.on("error", () => {}); // Ignore errors
 
-            const usbmuxdSocket = createUsbmuxdConnection(() => {
-                usbmuxdSocket.pipe(muxStream).pipe(usbmuxdSocket);
+            mux.on("peer_multiplex", (muxStream: Duplex) => {
+                muxStream.on("error", () => {}); // Ignore errors
+
+                const usbmuxdSocket = createUsbmuxdConnection(() => {
+                    usbmuxdSocket.pipe(muxStream).pipe(usbmuxdSocket);
+                });
             });
+
+            ws.on('close', () => {
+                wsStream.end();
+            });
+
+            if (!resolved) { resolve(); }
         });
 
         ws.on('close', () => {
-            wsStream.end();
+            logger.log(`Disconnected from ${url}`);
         });
-    });
-
-    ws.on('close', () => {
-        logger.log(`Disconnected from ${url}`);
     });
 }
