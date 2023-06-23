@@ -10,6 +10,7 @@ src/**
 .gitignore
 .yarnrc
 vsc-extension-quickstart.md
+PUBLISHING.md
 **/tsconfig.json
 **/.eslintrc.json
 **/*.map
