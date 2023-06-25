@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as logger from './logger';
-import { startUsbmuxdReverseProxy } from './usbmuxdReverseProxy';
+import { ensureUsbmuxdConnects, startUsbmuxdReverseProxy, usbmuxdConnectionFailureMessage } from './usbmuxdReverseProxy';
 
 type UsbmuxdReverseProxyAllowed = "unknown" | "yes" | "no";
 type ConfigShareLocalDevices = "ask" | "always" | "never";
@@ -78,6 +78,11 @@ export function activate(context: vscode.ExtensionContext) {
         if (usbmuxdReverseProxyAllowed !== "yes") {
             return;
         }
+
+        ensureUsbmuxdConnects().catch((e) => {
+            logger.error("Error ensuring usbmuxd connection:", e);
+            vscode.window.showWarningMessage(usbmuxdConnectionFailureMessage(), "Dismiss");
+        });
 
         await startUsbmuxdReverseProxy(url);
         vscode.window.showInformationMessage('Remote can now access iOS devices connected locally. Started forwarding connections to usbmuxd.');
