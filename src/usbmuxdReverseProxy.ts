@@ -42,6 +42,16 @@ export async function startUsbmuxdReverseProxy(url: string) {
                 const usbmuxdSocket = createUsbmuxdConnection(() => {
                     usbmuxdSocket.pipe(muxStream).pipe(usbmuxdSocket);
                 });
+
+                usbmuxdSocket.on("error", (e) => {
+                    logger.error("usbmuxd socket error:", e);
+                });
+
+                usbmuxdSocket.on("close", (hadError) => {
+                    if (hadError) {
+                        muxStream.end();
+                    }
+                });
             });
 
             ws.on('close', () => {
