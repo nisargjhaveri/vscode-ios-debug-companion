@@ -21,7 +21,7 @@ export function usbmuxdConnectionFailureMessage() {
         return "Locally connected iOS devices may not be available for debugging. Make sure you have [usbmuxd](https://github.com/libimobiledevice/usbmuxd) installed and running on the local machine.";
     }
     else if (process.platform === "win32") {
-        return 'Locally connected iOS devices may not be available for debugging. Make sure you have "iTunes" installed and "Apple Mobile Device Service (AMDS)" is running on the local machine.';
+        return 'Locally connected iOS devices may not be available for debugging. Make sure you have [iTunes](https://www.apple.com/in/itunes/) installed and "Apple Mobile Device Service (AMDS)" is running on the local machine.';
     }
     else {
         return "Locally connected iOS devices may not be available for debugging. Could not connect to usbmuxd socket on the local machine.";
